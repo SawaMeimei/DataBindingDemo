@@ -6,6 +6,7 @@ import android.view.View;
 import com.example.hasee.mvvm.annoation.BindText;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,28 +14,31 @@ import java.util.HashMap;
  */
 public class BindObtain {
 
-    private Activity $activity;
-    public void Bind(Activity activity){
-        this.$activity = activity;
-    }
-
-    public void notifyUI(){
-        if($activity==null){
-            throw new RuntimeException("plz bind first");
-        }
-        try{
+    public ArrayList<BindBlock> arr = new ArrayList<>();
+    public void Bind(Activity activity) {
+        try {
             Field[] fields = this.getClass().getDeclaredFields();
-            for(int i=0;i<fields.length;i++){
+            for (int i = 0; i < fields.length; i++) {
                 Field field = fields[i];
                 BindText annotation = field.getAnnotation(BindText.class);
-                if(annotation!=null){
+                if (annotation != null) {
                     int viewId = annotation.value();
-                    View view = $activity.findViewById(viewId);
+                    View view = activity.findViewById(viewId);
                     Field fieldSetText = view.getClass().getField("setText");
-                    fieldSetText.set($activity,field.get(this));
+                    arr.add(new BindBlock(fieldSetText, field, view));
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void notifyUI() {
+        try {
+            for (BindBlock block : arr) {
+                block.fieldSetText.set(block.bindView, block.fieldValue.get(this));
+            }
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
