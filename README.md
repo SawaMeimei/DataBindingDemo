@@ -1,5 +1,7 @@
 # DataBindingDemo
 
+[文章地址](https://sawameimei.github.io/2016/10/15/ioc2/)
+
 一个自己实现的DataBinding的小Demo 
 
 剩余的问题
